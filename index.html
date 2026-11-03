@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bussamlinks Technology | Tech Gadgets & Accessories</title>
+
+  <!-- PWA MANIFEST & MOBILE THEME -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e40af">
+
+  <!-- TAILWIND CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FONTAWESOME ICONS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans pb-20">
+
+  <!-- TOP HEADER -->
+  <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#" class="flex items-center space-x-2 text-xl font-bold tracking-wide">
+        <i class="fa-solid fa-bolt text-blue-500"></i>
+        <span>Bussamlinks<span class="text-blue-500">Tech</span></span>
+      </a>
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <i class="fa-solid fa-cart-shopping text-xl cursor-pointer"></i>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO BANNER -->
+  <section class="bg-gradient-to-r from-blue-700 to-indigo-900 text-white py-8 px-4 text-center">
+    <h1 class="text-2xl md:text-4xl font-extrabold mb-2">Quality Tech & Accessories</h1>
+    <p class="text-sm md:text-base text-gray-200">Power Banks, Earbuds, Phone Coolers, Tripods & More</p>
+  </section>
+
+  <!-- CATEGORY FILTER BUTTONS -->
+  <div class="max-w-6xl mx-auto px-4 py-4 overflow-x-auto flex space-x-2">
+    <button onclick="filterCategory('All', event)" class="category-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition">All Items</button>
+    <button onclick="filterCategory('Power Solutions', event)" class="category-btn bg-white text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition">Power Solutions</button>
+    <button onclick="filterCategory('Gaming & Cooling', event)" class="category-btn bg-white text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition">Gaming & Cooling</button>
+    <button onclick="filterCategory('Mobile Audio', event)" class="category-btn bg-white text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition">Mobile Audio</button>
+    <button onclick="filterCategory('Tripods & Mounts', event)" class="category-btn bg-white text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition">Tripods & Mounts</button>
+  </div>
+
+  <!-- PRODUCT GRID CONTAINER -->
+  <main class="max-w-6xl mx-auto px-4 py-4">
+    <h2 class="text-lg font-bold mb-4">Featured Tech Gadgets</h2>
+    <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <!-- Product cards loaded dynamically via app.js -->
+    </div>
+  </main>
+
+  <!-- FOOTER WITH DEVELOPER CREDIT -->
+  <footer class="bg-slate-950 text-gray-400 text-xs py-6 border-t border-slate-800 mt-10">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+      <div>
+        <p class="text-gray-300 font-semibold">Bussamlinks Technology © 2026</p>
+        <p class="text-gray-500 text-[11px] mt-0.5">All Rights Reserved. Premium Tech Gadgets & Accessories.</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-sm">
+        <span class="text-gray-400">Engineered & Developed by</span>
+        <span class="text-blue-400 font-extrabold tracking-wider">M I C O</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
