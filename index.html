@@ -53,17 +53,6 @@
         
         <!-- SHOP VIEW -->
         <div id="view-shop" class="space-y-3">
-            <!-- Flash Sale Banner -->
-            <div class="bg-gradient-to-r from-blue-700 to-indigo-900 rounded-xl p-3 text-white shadow-sm flex justify-between items-center text-xs">
-                <div>
-                    <span class="bg-orange-500 font-black px-1.5 py-0.5 rounded text-[9px]">FLASH SALE</span>
-                    <p class="font-bold mt-1">Mega Tech Discounts Active</p>
-                </div>
-                <div class="text-right font-mono text-[11px] text-blue-200">
-                    Ends in 04h : 12m
-                </div>
-            </div>
-
             <!-- Category Pills -->
             <div class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                 <button onclick="filterCat('All', this)" class="cat-btn bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shadow-sm">All Items</button>
@@ -73,8 +62,10 @@
                 <button onclick="filterCat('Audio', this)" class="cat-btn bg-white text-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap border border-gray-200">Audio</button>
             </div>
 
-            <!-- 2-Column Compact Grid -->
-            <div id="product-grid" class="grid grid-cols-2 gap-2.5"></div>
+            <!-- 2-Column Compact Grid (Sir Busam Preferred Layout) -->
+            <div id="product-grid" class="grid grid-cols-2 gap-2.5">
+                <!-- Injected via JS -->
+            </div>
         </div>
 
         <!-- CART VIEW -->
@@ -102,19 +93,15 @@
             </div>
         </div>
 
-        <!-- WISHLIST VIEW -->
-        <div id="view-wishlist" class="hidden space-y-3">
-            <h2 class="text-sm font-bold text-gray-800 border-b pb-2">Saved Wishlist</h2>
-            <div id="wishlist-items" class="space-y-2"></div>
-        </div>
-
         <!-- ACCOUNT VIEW -->
         <div id="view-account" class="hidden space-y-3">
-            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm text-center space-y-3" id="account-box"></div>
+            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm text-center space-y-3" id="account-box">
+                <!-- Injected via JS -->
+            </div>
         </div>
     </main>
 
-    <!-- NORMAL CHECKOUT MODAL -->
+    <!-- CHECKOUT MODAL -->
     <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-4 space-y-3 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
@@ -173,22 +160,17 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation (Jumia Standard 5-Tab Bar) -->
-    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 py-2 px-4 flex justify-around shadow-lg">
-        <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 py-2 px-6 flex justify-around shadow-lg">
+        <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[11px]">
             <i class="fa-solid fa-store text-base"></i><span>Shop</span>
         </button>
-        <button onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[10px] relative">
+        <button onclick="switchTab('cart')" id="nav-cart" class="flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[11px] relative">
             <i class="fa-solid fa-cart-shopping text-base"></i>
             <span id="cart-badge" class="absolute -top-1 right-2 bg-blue-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
             <span>Cart</span>
         </button>
-        <button onclick="switchTab('wishlist')" id="nav-wishlist" class="flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[10px] relative">
-            <i class="fa-solid fa-heart text-base"></i>
-            <span id="wish-badge" class="absolute -top-1 right-2 bg-blue-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
-            <span>Wishlist</span>
-        </button>
-        <button onclick="switchTab('account')" id="nav-account" class="flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[10px]">
+        <button onclick="switchTab('account')" id="nav-account" class="flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[11px]">
             <i class="fa-solid fa-user text-base"></i><span>Account</span>
         </button>
     </nav>
@@ -206,7 +188,6 @@
         ];
 
         let cart = JSON.parse(localStorage.getItem('bussam_cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('bussam_wishlist')) || [];
         let currentUser = JSON.parse(localStorage.getItem('bussam_user')) || null;
         let activeCategory = 'All';
 
@@ -229,9 +210,6 @@
         function renderProducts(items) {
             document.getElementById('product-grid').innerHTML = items.map(p => `
                 <div class="bg-white rounded-xl border border-gray-200 p-2.5 flex flex-col justify-between shadow-sm relative">
-                    <button onclick="toggleWishlist(${p.id})" class="absolute top-2 right-2 z-10 text-xs ${wishlist.includes(p.id) ? 'text-red-500' : 'text-gray-300'}">
-                        <i class="fa-solid fa-heart text-base"></i>
-                    </button>
                     <span class="absolute top-2 left-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded">${p.discount}</span>
                     <div class="h-28 bg-gray-50 rounded-lg overflow-hidden mb-2">
                         <img src="${p.image}" class="w-full h-full object-cover">
@@ -270,14 +248,13 @@
         }
 
         function switchTab(tab) {
-            ['shop', 'cart', 'wishlist', 'account'].forEach(t => {
+            ['shop', 'cart', 'account'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[10px]";
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center gap-0.5 text-gray-400 font-bold text-[11px]";
             });
             document.getElementById(`view-${tab}`).classList.remove('hidden');
-            document.getElementById(`nav-${tab}`).className = "flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]";
+            document.getElementById(`nav-${tab}`).className = "flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[11px]";
             if (tab === 'cart') renderCart();
-            if (tab === 'wishlist') renderWishlist();
             if (tab === 'account') renderAccount();
         }
 
@@ -286,22 +263,13 @@
             if (exists) exists.qty++;
             else cart.push({ id, qty: 1 });
             localStorage.setItem('bussam_cart', JSON.stringify(cart));
-            updateBadges();
+            updateBadge();
             alert("Added to cart!");
         }
 
-        function toggleWishlist(id) {
-            if (wishlist.includes(id)) wishlist = wishlist.filter(w => w !== id);
-            else wishlist.push(id);
-            localStorage.setItem('bussam_wishlist', JSON.stringify(wishlist));
-            updateBadges();
-            renderProducts(products);
-        }
-
-        function updateBadges() {
-            const totalCart = cart.reduce((s, i) => s + i.qty, 0);
-            document.getElementById('cart-badge').innerText = totalCart;
-            document.getElementById('wish-badge').innerText = wishlist.length;
+        function updateBadge() {
+            const total = cart.reduce((s, i) => s + i.qty, 0);
+            document.getElementById('cart-badge').innerText = total;
         }
 
         function renderCart() {
@@ -331,29 +299,6 @@
             }).join('');
             document.getElementById('cart-subtotal').innerText = `₦${subtotal.toLocaleString()}`;
             document.getElementById('cart-total').innerText = `₦${subtotal.toLocaleString()}`;
-        }
-
-        function renderWishlist() {
-            const container = document.getElementById('wishlist-items');
-            if (wishlist.length === 0) {
-                container.innerHTML = `<div class="bg-white rounded-xl p-6 text-center text-gray-400 text-xs">Your wishlist is empty.</div>`;
-                return;
-            }
-            container.innerHTML = wishlist.map(id => {
-                const p = products.find(prod => prod.id === id);
-                return `
-                    <div class="bg-white rounded-xl border p-2.5 flex items-center justify-between shadow-sm">
-                        <div class="flex items-center gap-2.5">
-                            <img src="${p.image}" class="w-10 h-10 rounded-lg object-cover">
-                            <div>
-                                <h4 class="text-[11px] font-bold text-gray-800 line-clamp-1">${p.name}</h4>
-                                <p class="text-[11px] font-black text-gray-900">₦${p.price.toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <button onclick="addToCart(${p.id}); switchTab('cart')" class="bg-blue-600 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow">Add to Cart</button>
-                    </div>
-                `;
-            }).join('');
         }
 
         function renderAccount() {
@@ -421,7 +366,7 @@
 
             cart = [];
             localStorage.removeItem('bussam_cart');
-            updateBadges();
+            updateBadge();
             closeCheckout();
 
             window.open(`https://wa.me/${STORE_WHATSAPP}?text=${msg}`, '_blank');
@@ -440,7 +385,7 @@
         }
 
         renderProducts(products);
-        updateBadges();
+        updateBadge();
     </script>
 </body>
 </html>
