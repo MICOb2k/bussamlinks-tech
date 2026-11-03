@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bussamlinks Technology</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1d4ed8">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      
+      // TODO: Replace with your Firebase project config when deploying live
+      const firebaseConfig = {
+        apiKey: "AIzaSyDummyKeyForPrototype12345",
+        authDomain: "bussamlinks-tech.firebaseapp.com",
+        projectId: "bussamlinks-tech",
+        storageBucket: "bussamlinks-tech.appspot.com",
+        messagingSenderId: "1234567890",
+        appId: "1:1234567890:web:abcdef"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+
+      window.loginWithGoogle = async () => {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (error) {
+          console.error("Auth error:", error);
+          alert("Google Sign-In simulation active. Configure your Firebase keys for production live sync!");
+        }
+      };
+
+      window.logoutUser = async () => {
+        await signOut(auth);
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        const profileContainer = document.getElementById("profile-content");
+        if (user) {
+          profileContainer.innerHTML = `
+            <div class="text-center p-6 bg-slate-900 rounded-xl shadow-xl border border-blue-500/30">
+              <img src="${user.photoURL || 'https://via.placeholder.com/96'}" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-blue-500 shadow-md">
+              <h3 class="text-xl font-bold text-white">${user.displayName}</h3>
+              <p class="text-sm text-slate-400 mb-4">${user.email}</p>
+              <span class="inline-block bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full mb-6 border border-emerald-500/30 font-medium">Verified Customer account</span>
+              <button onclick="logoutUser()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg transition-all shadow-lg">Sign Out</button>
+            </div>
+          `;
+        } else {
+          profileContainer.innerHTML = `
+            <div class="text-center p-8 bg-slate-900 rounded-xl shadow-xl border border-slate-800">
+              <div class="w-16 h-16 bg-blue-600/20 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2">Sign in to Bussamlinks</h3>
+              <p class="text-sm text-slate-400 mb-6">Access order tracking, saved carts, and express checkout features.</p>
+              <button onclick="loginWithGoogle()" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Continue with Google
+              </button>
+            </div>
+          `;
+        }
+      });
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans selection:bg-blue-600 selection:text-white">
+
+    <!-- Top Header -->
+    <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-md">
+        <div class="flex items-center gap-2">
+            <div class="bg-blue-600 text-white p-2 rounded-xl shadow-lg shadow-blue-600/30">
+                <i class="fa-solid fa-bolt-lightning"></i>
+            </div>
+            <h1 class="font-black text-lg tracking-tight bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">BussamlinksTech</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="toggleCart()" class="relative bg-slate-800 hover:bg-slate-700 p-2.5 rounded-xl border border-slate-700 transition-all">
+                <i class="fa-solid fa-cart-shopping text-blue-400"></i>
+                <span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Flash Deal Banner (Temu/Jumia Style) -->
+    <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 border-b border-blue-500/20 px-4 py-2.5 text-xs flex justify-between items-center text-blue-200">
+        <div class="flex items-center gap-2">
+            <span class="bg-red-500 text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">Flash Sale</span>
+            <span>Ends in <strong id="countdown" class="text-white">04:12:55</strong></span>
+        </div>
+        <span class="hidden sm:inline text-slate-400">Free nationwide delivery on orders over ₦50,000</span>
+    </div>
+
+    <!-- Main Container views -->
+    <main class="max-w-7xl mx-auto p-4">
+        
+        <!-- SHOP VIEW -->
+        <div id="view-shop" class="space-y-4">
+            <!-- Search & Filter Bar -->
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                    <input type="text" id="search-input" oninput="filterProducts()" placeholder="Search power banks, coolers, earbuds..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+            </div>
+
+            <!-- Category Pills -->
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <button onclick="filterCategory('All')" class="category-btn bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap shadow-md shadow-blue-600/20 transition-all">All Items</button>
+                <button onclick="filterCategory('Power')" class="category-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-800 transition-all">Power Solutions</button>
+                <button onclick="filterCategory('Gaming')" class="category-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-800 transition-all">Gaming & Cooling</button>
+                <button onclick="filterCategory('Audio')" class="category-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-800 transition-all">Mobile Audio</button>
+                <button onclick="filterCategory('Tripod')" class="category-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-800 transition-all">Tripods</button>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <!-- Product items rendered dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- PROFILE / ME VIEW -->
+        <div id="view-profile" class="hidden max-w-md mx-auto pt-8">
+            <h2 class="text-2xl font-black mb-6 text-center">User Account</h2>
+            <div id="profile-content">
+                <!-- Injected by Firebase script -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Slide-over Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden transition-opacity">
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-slate-900 border-l border-slate-800 flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-blue-500"></i> Your Shopping Cart</h3>
+                <button onclick="toggleCart()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- Cart items list -->
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Subtotal</span>
+                    <span id="cart-subtotal" class="font-bold text-white">₦0</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400">Delivery Estimate</span>
+                    <span class="text-emerald-400 font-medium">Calculated at checkout</span>
+                </div>
+                <hr class="border-slate-800">
+                <div class="flex justify-between text-base font-bold">
+                    <span>Total</span>
+                    <span id="cart-total" class="text-blue-400">₦0</span>
+                </div>
+                <button onclick="checkoutWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-brands fa-whatsapp text-xl"></i> Complete Order via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 py-2 px-6 flex justify-around items-center">
+        <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center gap-1 text-blue-500 transition-all">
+            <i class="fa-solid fa-store text-lg"></i>
+            <span class="text-[10px] font-semibold">Shop</span>
+        </button>
+        <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition-all">
+            <i class="fa-solid fa-user text-lg"></i>
+            <span class="text-[10px] font-semibold">Me</span>
+        </button>
+    </nav>
+
+    <!-- Script Application Logic -->
+    <script>
+        const products = [
+            {
+                id: 1,
+                name: "20,000mAh 22.5W Fast Charge Power Bank",
+                category: "Power",
+                price: 18500,
+                oldPrice: 22000,
+                rating: 4.8,
+                reviews: 124,
+                stock: "In Stock",
+                tag: "-15%",
+                image: "https://images.unsplash.com/photo-1609592424104-97d4c4e1c72a?auto=format&fit=crop&w=600&q=80",
+                specs: "22.5W Fast Charge • Dual USB Ports"
+            },
+            {
+                id: 2,
+                name: "Dual-Fan RGB Semiconductor Phone Cooler",
+                category: "Gaming",
+                price: 12500,
+                oldPrice: 16000,
+                rating: 4.9,
+                reviews: 89,
+                stock: "In Stock",
+                tag: "Hot Deal",
+                image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=600&q=80",
+                specs: "Rapid Ice Cooling • Silent Turbofan"
+            },
+            {
+                id: 3,
+                name: "Wireless ANC Bluetooth Earbuds",
+                category: "Audio",
+                price: 15000,
+                oldPrice: 19500,
+                rating: 4.7,
+                reviews: 210,
+                stock: "Out of Stock",
+                tag: "Sold Out",
+                image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=600&q=80",
+                specs: "Active Noise Cancelling • LED Case"
+            },
+            {
+                id: 4,
+                name: "Adjustable Desktop & Floor Tripod Stand",
+                category: "Tripod",
+                price: 8500,
+                oldPrice: 11000,
+                rating: 4.6,
+                reviews: 53,
+                stock: "In Stock",
+                tag: "Best Value",
+                image: "https://images.unsplash.com/photo-1583278917265-d363719b068e?auto=format&fit=crop&w=600&q=80",
+                specs: "360° Rotation • Bluetooth Remote"
+            }
+        ];
+
+        let cart = [];
+        let activeCategory = 'All';
+
+        function renderProducts(items) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = items.map(p => `
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col justify-between shadow-xl transition-all hover:border-blue-500/40">
+                    <div class="relative bg-slate-950 h-48 overflow-hidden">
+                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow">${p.tag}</span>
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-300">
+                        <span class="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur-sm text-xs px-2 py-1 rounded-md text-slate-300 font-medium">
+                            ⭐ ${p.rating} (${p.reviews})
+                        </span>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-blue-400 tracking-wider">${p.category}</span>
+                            <h3 class="font-bold text-sm text-white line-clamp-1 mt-0.5">${p.name}</h3>
+                            <p class="text-xs text-slate-400 mt-1">${p.specs}</p>
+                        </div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-lg font-black text-white">₦${p.price.toLocaleString()}</span>
+                            <span class="text-xs text-slate-500 line-through">₦${p.oldPrice.toLocaleString()}</span>
+                        </div>
+                        <div class="space-y-2">
+                            ${p.stock === 'In Stock' 
+                                ? `<button onclick="addToCart(${p.id})" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-md shadow-blue-600/30 transition-all flex items-center justify-center gap-1.5"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>`
+                                : `<button disabled class="w-full bg-slate-800 text-slate-500 text-xs font-bold py-2.5 rounded-xl cursor-not-allowed">Unavailable</button>`
+                            }
+                            <button onclick="orderSingleWhatsApp('${p.name}', ${p.price})" class="w-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-600/20');
+                btn.classList.add('bg-slate-900', 'text-slate-300', 'border', 'border-slate-800');
+            });
+            event.target.classList.remove('bg-slate-900', 'text-slate-300', 'border', 'border-slate-800');
+            event.target.classList.add('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-600/20');
+
+            const query = document.getElementById('search-input').value.toLowerCase();
+            applyFilters();
+        }
+
+        function filterProducts() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            let filtered = products.filter(p => {
+                const matchesCat = activeCategory === 'All' || p.category === activeCategory;
+                const matchesQuery = p.name.toLowerCase().includes(query) || p.specs.toLowerCase().includes(query);
+                return matchesCat && matchesQuery;
+            });
+            renderProducts(filtered);
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            updateCartUI();
+            toggleCart();
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.innerText = totalQty;
+
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">Your cart is currently empty.</div>`;
+            } else {
+                container.innerHTML = cart.map(item => `
+                    flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image}" class="w-12 h-12 rounded-lg object-cover">
+                            <div>
+                                <h4 class="text-xs font-bold text-white line-clamp-1">${item.name}</h4>
+                                <span class="text-xs text-blue-400 font-semibold">₦${item.price.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-slate-800 rounded flex items-center justify-center text-xs font-bold">-</button>
+                            <span class="text-xs font-bold">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 bg-slate-800 rounded flex items-center justify-center text-xs font-bold">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('cart-subtotal').innerText = `₦${subtotal.toLocaleString()}`;
+            document.getElementById('cart-total').innerText = `₦${subtotal.toLocaleString()}`;
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        function switchTab(tab) {
+            document.getElementById('view-shop').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            
+            document.getElementById('nav-shop').classList.remove('text-blue-500');
+            document.getElementById('nav-shop').classList.add('text-slate-400');
+            document.getElementById('nav-profile').classList.remove('text-blue-500');
+            document.getElementById('nav-profile').classList.add('text-slate-400');
+
+            if (tab === 'shop') {
+                document.getElementById('view-shop').classList.remove('hidden');
+                document.getElementById('nav-shop').classList.remove('text-slate-400');
+                document.getElementById('nav-shop').classList.add('text-blue-500');
+            } else if (tab === 'profile') {
+                document.getElementById('view-profile').classList.remove('hidden');
+                document.getElementById('nav-profile').classList.remove('text-slate-400');
+                document.getElementById('nav-profile').classList.add('text-blue-500');
+            }
+        }
+
+        function orderSingleWhatsApp(name, price) {
+            const msg = encodeURIComponent(`Hello Bussamlinks Technology 👋, I want to place an order for:\n\n*${name}*\nPrice: ₦${price.toLocaleString()}\n\nPlease confirm availability and delivery.`);
+            window.open(`https://wa.me/2348000000000?text=${msg}`, '_blank');
+        }
+
+        function checkoutWhatsApp() {
+            if (cart.length === 0) return alert("Your cart is empty!");
+            let list = cart.map(i => `• ${i.name} (x${i.qty}) - ₦${(i.price * i.qty).toLocaleString()}`).join('\n');
+            let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const msg = encodeURIComponent(`Hello Bussamlinks Technology 👋, I am checking out with the following items:\n\n${list}\n\n*Total: ₦${total.toLocaleString()}*\n\nPlease process my order.`);
+            window.open(`https://wa.me/2348000000000?text=${msg}`, '_blank');
+        }
+
+        // Initialize Shop Render
+        renderProducts(products);
+    </script>
+</body>
+</html>
+
